@@ -7,6 +7,16 @@ print("🚀 FastAPI app is starting...")
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or specify your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class Location(BaseModel):
     latitude: float
     longitude: float
