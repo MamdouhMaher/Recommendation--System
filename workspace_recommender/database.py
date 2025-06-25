@@ -32,5 +32,5 @@ def get_workspace_data():
     # Drop rows that are still missing lat/lon after extraction
     df.dropna(subset=["latitude", "longitude"], inplace=True)
 
-    return df[["name", "amenities", "averageRating", "latitude", "longitude", "amenities_count"]]
+    return df[["name", "amenities", "averageRating", "latitude", "longitude", "amenities_count","image"]]
 
