@@ -13,7 +13,7 @@ def get_workspace_data():
     mongo_uri = os.getenv("MONGO_URI")
     if not mongo_uri:
         print("❌ MONGO_URI is not set!")
-        return None
+        return pd.DataFrame()  # Return empty dataframe instead of None
 
     client = MongoClient(mongo_uri)
     db = client["workLocate"]
@@ -21,23 +21,31 @@ def get_workspace_data():
     data = list(collection.find())
     df = pd.DataFrame(data)
 
-    #  Convert ObjectId to string for safety
-    df["_id"] = df["_id"].astype(str)
+    # ✅ SAFELY extract coordinates
+    def extract_lat(x):
+        if isinstance(x, dict) and "coordinates" in x:
+            coords = x["coordinates"]
+            if isinstance(coords, list) and len(coords) >= 2:
+                return coords[0]
+        return None
 
-    df["latitude"] = df["location"].apply(lambda x: x["coordinates"][0] if isinstance(x, dict) and "coordinates" in x else None)
-    df["longitude"] = df["location"].apply(lambda x: x["coordinates"][1] if isinstance(x, dict) and "coordinates" in x else None)
+    def extract_lon(x):
+        if isinstance(x, dict) and "coordinates" in x:
+            coords = x["coordinates"]
+            if isinstance(coords, list) and len(coords) >= 2:
+                return coords[1]
+        return None
+
+    df["latitude"] = df["location"].apply(extract_lat)
+    df["longitude"] = df["location"].apply(extract_lon)
+
     df["amenities_count"] = df["amenities"].apply(lambda x: len(x) if isinstance(x, list) else 0)
 
     return df[[
-        "_id",
-        "name",
-        "amenities",
-        "averageRating",
-        "latitude",
-        "longitude",
-        "amenities_count",
-        "image"
+        "_id", "name", "amenities", "averageRating",
+        "latitude", "longitude", "amenities_count", "image"
     ]]
+
 
     # Optional debug info: print how many rows were skipped due to invalid coordinates
     missing = df[["latitude", "longitude"]].isnull().any(axis=1).sum()
