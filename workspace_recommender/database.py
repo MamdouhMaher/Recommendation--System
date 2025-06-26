@@ -21,9 +21,23 @@ def get_workspace_data():
     data = list(collection.find())
     df = pd.DataFrame(data)
 
-    df["latitude"] = df["location"].apply(lambda x: extract_lat_lon(x, 0))
-    df["longitude"] = df["location"].apply(lambda x: extract_lat_lon(x, 1))
+    #  Convert ObjectId to string for safety
+    df["_id"] = df["_id"].astype(str)
+
+    df["latitude"] = df["location"].apply(lambda x: x["coordinates"][0] if isinstance(x, dict) and "coordinates" in x else None)
+    df["longitude"] = df["location"].apply(lambda x: x["coordinates"][1] if isinstance(x, dict) and "coordinates" in x else None)
     df["amenities_count"] = df["amenities"].apply(lambda x: len(x) if isinstance(x, list) else 0)
+
+    return df[[
+        "_id",
+        "name",
+        "amenities",
+        "averageRating",
+        "latitude",
+        "longitude",
+        "amenities_count",
+        "image"
+    ]]
 
     # Optional debug info: print how many rows were skipped due to invalid coordinates
     missing = df[["latitude", "longitude"]].isnull().any(axis=1).sum()
