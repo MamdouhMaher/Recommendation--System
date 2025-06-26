@@ -6,21 +6,23 @@ def recommend_nearby(user_lat, user_lon, top_n=5):
 
     df = df.dropna(subset=["latitude", "longitude"])
     df["distance"] = df.apply(
-        lambda row: geodesic((user_lat, user_lon), (row["latitude"], row["longitude"])).km,
+        lambda row: geodesic(
+            (user_lat, user_lon),
+            (row["latitude"], row["longitude"])
+        ).km,
         axis=1
     )
 
     top_results = df.sort_values(by="distance").head(top_n)
 
-return top_results[[
-    "_id",
-    "name",
-    "amenities",
-    "averageRating",
-    "latitude",
-    "longitude",
-    "amenities_count",
-    "image",
-    "distance"
-]]
-
+    return top_results[[
+        "_id",
+        "name",
+        "amenities",
+        "averageRating",
+        "latitude",
+        "longitude",
+        "amenities_count",
+        "image",
+        "distance"
+    ]]
