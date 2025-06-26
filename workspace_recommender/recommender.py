@@ -13,8 +13,8 @@ def recommend_nearby(user_lat, user_lon, top_n=5):
     top_results = df.sort_values(by="distance").head(top_n)
 
     return top_results[[
+        "_id",
         "name",
-        "id",
         "amenities",
         "averageRating",
         "latitude",
