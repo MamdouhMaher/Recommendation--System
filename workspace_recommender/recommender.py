@@ -14,6 +14,7 @@ def recommend_nearby(user_lat, user_lon, top_n=5):
 
     return top_results[[
         "name",
+        "id",
         "amenities",
         "averageRating",
         "latitude",
