@@ -27,7 +27,10 @@ def home():
 
 @app.post("/recommend")
 def recommend(location: Location):
-    print(f"📍 Received: lat={location.latitude}, lon={location.longitude}")
     results = recommend_nearby(location.latitude, location.longitude)
-    return results.to_dict(orient="records")
+    data = results.to_dict(orient="records")
+    for item in data:
+        item["_id"] = str(item["_id"])
+    return data
+
 
